@@ -11,6 +11,7 @@ Changes
 I created an R project. Therefore the paths to the data and graphs become shorter and independent from the author.
 
 I use tidyverse packages for data handling. 
+The core tidyverse packages (dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr) are loaded automatically.
 Hence I load data with either readr::read_delim() instead of base::read.csv() or
 readxl::read_excel() instead of xlsx::read.xlsx().
 
@@ -25,11 +26,13 @@ Before plotting, I removed the NAs again.
 I include more years on the x-axes in plots
 I add the source of the data to the caption
 I always add a zero-line to the plots
-In ggplot functions, the argument "size" has been replaced with "linewidth".
+In ggplot functions, the deprecated argument "size" has been replaced with "linewidth".
 
-When possible, I include the legends in the title.
+When possible, I include the legends in the title, using the ggtext package.
 
-I also replaced ----- with **** so that the dashes may indicate the document outline.
+I also replaced ----- with **** so that the dashes may indicate the document outline (Ctrl + Shift + O).
+
+I use the "styler" package to format the scripts according to the Tidyverse Style Guide (based on Google's R style guide).
 
 
 Notes

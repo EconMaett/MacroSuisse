@@ -126,11 +126,11 @@ p <- ts_df(
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
   theme(text = element_text(family = "Palatino")) +
   theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = ggtext::element_markdown(), legend.position = "none")
+  theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
 
-ggsave(filename = "S01E01_PrimeDeRisque/Obligations.png", width = 5, height = 4)
+ggsave(filename = "S01E01_PrimeDeRisque/Obligations.png", width = 8, height = 4)
 graphics.off()
 
 # ************************************************************************
@@ -166,7 +166,7 @@ p <- ts_df(
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
   theme(text = element_text(family = "Palatino")) +
   theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = ggtext::element_markdown(), legend.position = "none")
+  theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p <- p + geom_text(x = myLines[1], y = 1.3, label = "Faillite Lehman", colour = "blue", angle = 90, vjust = -1)
 p <- p + geom_text(x = myLines[2], y = 1.0, label = "Fin du taux plancher", colour = "blue", angle = 90, vjust = -1)
@@ -176,7 +176,7 @@ p
 # Le risque d’être en faillite, et donc la prime de risque, 
 # augmente dans des crises économiques. 
 # Une «courbe de fièvre» avec laquelle on peut rapidement détecter des crisés économiques
-ggsave(filename = "S01E01_PrimeDeRisque/PrimesDeRisque.png", width = 5, height = 4)
+ggsave(filename = "S01E01_PrimeDeRisque/PrimesDeRisque.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -218,12 +218,12 @@ p <- ts_df(
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
   theme(text = element_text(family = "Palatino")) +
   theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = ggtext::element_markdown(), legend.position = "none")
+  theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
 # Lien avec la variation des ouvertures de procédures de faillite.
 # Les informations des marchés financiers sont disponible chaque jour!
 # Des autres statistiques sont publié avec des retards important.
-ggsave(filename = "S01E01_PrimeDeRisque/ProcFaillitePrime.png", width = 5, height = 4)
+ggsave(filename = "S01E01_PrimeDeRisque/ProcFaillitePrime.png", width = 8, height = 4)
 graphics.off()
 # END

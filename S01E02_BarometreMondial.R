@@ -11,12 +11,14 @@
 # Université de Neuchâtel et KOF Centre de recherches conjoncturelles
 # ************************************************************************
 library(tsbox)
-library(tidyverse) # Core tidyverse: dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr
-library(forecast) # Automatic ARIMA model selection
-library(xts) # Built on the zoo package
-library(readxl) # Non-core tidyverse
-library(ggtext) # To include HTML code in ggplot elements
+library(tidyverse)
+library(forecast)
+library(xts)
+library(readxl)
+library(ggtext)
 
+
+# Ideally put the functions in a separate file and access them with the source() command
 getForecastVariance <- function(fcst) {
   # Function to extract forecast error variance from a forecast object
   # CI lower = y(t+h|t) - 1.96*sig(h)
@@ -30,7 +32,7 @@ getForecastVariance <- function(fcst) {
 
 startDate <- "1999-01-01"
 # Last date should be first date of last quarter
-endDate   <- lubridate::round_date(x = today(), unit = "quarter") - months(3)
+endDate   <- round_date(x = today(), unit = "quarter") - months(3)
 
 # ************************************************************************
 # Download the data ----
@@ -64,15 +66,11 @@ PIB <- read_excel(
   range = cell_limits(c(11, 1), c(NA, NA)) # Specify open rectangle, upper left = A11
 )
 
-head(PIB) # Year, Quarter, Value
-
 # Date: Year, first month of quarter, first day
 PIB <- PIB |> 
   mutate(Date = as.Date(paste0(`...1`, "-", `...2`*3 - 2, "-01"))) |> 
   rename(PIB = `...3`) |> 
   select(Date, PIB)
-
-head(PIB) # Date, PIB
 
 # Create an xts object
 PIB <- xts(x = as.numeric(PIB$PIB), order.by = PIB$Date)
@@ -90,13 +88,10 @@ graphics.off()
 ## Baro ----
 # Leading KOF global barometer
 Baro <- read_excel(path = "S01E02_BarometreMondial/Barometre.xlsx", sheet = "Sheet1")
-head(Baro) # date, globalbaro_coincident, globalbaro_leading, gdp_reference
 
 Baro <- Baro |> 
   mutate(Date = as.Date(paste0(date, "-01"))) |> 
   select(Date, globalbaro_leading)
-
-head(Baro) # Date, globalbaro_leading
 
 # Create time series (use aggregate GDP and the Barom leading indicator)
 Baro <- xts(x = as.numeric(Baro$globalbaro_leading), order.by = Baro$Date)
@@ -107,8 +102,8 @@ graphics.off()
 
 # Note that such survey indices are typically designed to be stationary.
 
-# Normalize the Baro so that it has the same mean and standard deviation as 
-# quarter-on-quarter GDP growth in percent
+# Normalize the barometer and then scale it to the GDP growth rates
+# so that the mean and standard deviation are the same for both series. 
 mPIB   <- as.numeric(mean(ts_pc(PIB), na.rm = TRUE))
 sdPIB  <- as.numeric(sqrt(var(ts_pc(PIB), na.rm = TRUE)))
 
@@ -128,7 +123,6 @@ Vol <- Vol |>
   mutate(Date = dmy(Date)) |> 
   select(Date, Indexvalue)
 
-head(Vol)
 # Create a time series object
 Vol <- xts(x = as.numeric(Vol$Indexvalue), order.by = Vol$Date)
 
@@ -143,6 +137,7 @@ graphics.off()
 # Normalize the VSMI in the same way as the barometer
 mVol    <- as.numeric(mean(Vol, na.rm = TRUE))
 sdVol   <- as.numeric(sqrt(var(Vol, na.rm = TRUE)))
+
 # VSMI' = {(VSMI - E[VSMI])/SD[VSMI]}*SD[PIB] + E[PIB]
 VolNorm <- (Vol - mVol) / sdVol * sdPIB + mPIB
 
@@ -209,11 +204,11 @@ p <- ts_df(
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
   theme(text = element_text(family = "Palatino")) +
   theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = ggtext::element_markdown(), legend.position = "none")
+  theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
 
-ggsave(filename = "S01E02_BarometreMondial/PIBetBaro.png", width = 6, height = 4)
+ggsave(filename = "S01E02_BarometreMondial/PIBetBaro.png", width = 8, height = 4)
 graphics.off()
 
 ## BIP vs Baro & VolNorm ----
@@ -247,7 +242,7 @@ p <- ts_df(
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
   theme(text = element_text(family = "Palatino")) +
   theme(panel.grid.major = element_line(colour = "black", size = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = ggtext::element_markdown(), legend.position = "none")
+  theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
 
@@ -269,15 +264,6 @@ Model <- Arima(
   include.constant = TRUE, 
   xreg = XVars[1:(nrow(XVars) - 2), ] # We have two more quarters of input data than we have GDP growth rate observations
   )
-
-# Model with BaroQ, Vol:
-# Note that we do not ARIAM errors. Hence this is a simple linear regression.
-summary(Model)
-
-names(summary(Model))
-names(summary(Model)$model)
-Model$var.coef
-Model$xreg
 
 # Use the model to generate forecasts
 Forecast <- forecast(
@@ -309,7 +295,7 @@ p <- autoplot(Forecast, fan = TRUE) +
 
 p
 
-ggsave(filename = "S01E02_BarometreMondial/PIBPrevision.png", width = 5, height = 4)
+ggsave(filename = "S01E02_BarometreMondial/PIBPrevision.png", width = 8, height = 4)
 graphics.off()
 
 # Plot the pseudo-performance
