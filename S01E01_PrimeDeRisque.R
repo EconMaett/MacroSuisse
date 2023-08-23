@@ -8,23 +8,18 @@
 #
 # Matthias Spichiger, 2023 (matthias.spichiger@bluewin.ch)
 # Based on Daniel Kaufmann, 2020 (daniel.kaufmann@unine.ch)
-# Université de Neuchâtel et KOF Centre de recherches conjoncturelles
 # ************************************************************************
-library(tidyverse) # Core tidyverse packages dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr
+library(tidyverse)
 library(tsbox)
-library(xts) # Builds on the zoo package
-library(readxl) # Non-core tidyverse package; load separately
-library(ggtext) # To include HTML code in ggplot elements
+library(xts)
+library(readxl)
+library(ggtext)
 
 startDate <- "2007-06-01"
 
 # ************************************************************************
 # Compute risk premia ----
 # ************************************************************************
-# Qu'est-ce que c'est une prime de risque?
-# C'est la différence entre le rendement d'une dette soumis à un risque
-# de faillite (entreprises privées) et le rendement d'une dette sans risque
-# (obligation de la Conféderation Suisse).
 
 ## Download the data ----
 urls <- c(
@@ -40,9 +35,6 @@ for (i in seq_along(urls)) {
   download.file(url = urls[i], destfile = paste0("S01E01_PrimeDeRisque/", names[i]), mode = "wb", quiet = TRUE)
 }
 
-# Note: If you use readr::read_csv() instead of base::read.csv, the data are stored in tibble objects instead of data.frame objects
-# Selecting a single column of a tibble results in a tibble, selecting a single column of a data.frame results in a vector
-# You have to use pull() to store a single tibble column as a vector
 Gov      <- read_delim(file = "S01E01_PrimeDeRisque/ObligationsConf.csv", delim = ";", skip = 4)
 NonGov   <- read_delim(file = "S01E01_PrimeDeRisque/ObligationsEnt.csv", delim = ";", skip = 4)
 Defaults <- read_excel(path = "S01E01_PrimeDeRisque/Defaults_OFS.xlsx", sheet = "T6.2.3.1", skip = 1)
@@ -86,11 +78,9 @@ RPAAA1 <- AA1  - Gov1
 # ************************************************************************
 # Create charts ----
 # ************************************************************************
+
 # Important dates; Bankruptcy of Lehman Brothers, removal of CHF-EUR peg, COVID-19 pandemic
 myLines <- c(as.numeric(as.Date("2008-09-15")), as.numeric(as.Date("2015-01-15")), as.numeric(as.Date("2020-02-01")))
-
-# the function ts_ggplot() has problems, we therefore create a data frame and
-# use regular ggplot2 functions instead
 
 # ************************************************************************
 # Government & investment-grade corporate bond yields ----
@@ -221,9 +211,7 @@ p <- ts_df(
   theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
-# Lien avec la variation des ouvertures de procédures de faillite.
-# Les informations des marchés financiers sont disponible chaque jour!
-# Des autres statistiques sont publié avec des retards important.
+
 ggsave(filename = "S01E01_PrimeDeRisque/ProcFaillitePrime.png", width = 8, height = 4)
 graphics.off()
 # END

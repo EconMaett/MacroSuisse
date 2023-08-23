@@ -8,7 +8,6 @@
 #
 # Matthias Spichiger, 2023 (matthias.spichiger@bluewin.ch)
 # Based on Daniel Kaufmann, 2020 (daniel.kaufmann@unine.ch)
-# Université de Neuchâtel et KOF Centre de recherches conjoncturelles
 # ************************************************************************
 library(tsbox)
 library(tidyverse)
@@ -16,7 +15,6 @@ library(forecast)
 library(xts)
 library(readxl)
 library(ggtext)
-
 
 # Ideally put the functions in a separate file and access them with the source() command
 getForecastVariance <- function(fcst) {
@@ -40,7 +38,6 @@ endDate   <- round_date(x = today(), unit = "quarter") - months(3)
 # Source: https://kof.ethz.ch/fr/previsions-indicateurs/indicateurs/kof-globalbaro.html
 # Baromètre mondial: Les deux indicateurs sont composés des résultats d'enquêtes
 # conjoncturelles menes dans plus de 50 pays.
-# Note: The author used to download .xls files. Today, only .xlsx files are provided
 urls <- c(
   "https://datenservice.kof.ethz.ch/api/v1/public/ts?keys=ch.kof.globalbaro.coincident,ch.kof.globalbaro.leading,ch.kof.globalbaro.gdp_reference&mime=xlsx&name=date,globalbaro_coincident,globalbaro_leading,gdp_reference",
   "https://www.seco.admin.ch/dam/seco/de/dokumente/Wirtschaft/Wirtschaftslage/VIP%20Quartalssch%C3%A4tzungen/qna_p_csa.xlsx.download.xlsx/qna_p_csa.xlsx",
@@ -77,10 +74,8 @@ PIB <- xts(x = as.numeric(PIB$PIB), order.by = PIB$Date)
 plot(PIB)
 graphics.off()
 
-# Note: Because PIB shows a clear upwards trend, we want to take quarter-on-quarter growth rates
-# in percent that look more stationary.
-# Note that if we regress non-stationary series on each other, we end up with spurious
-# regression results.
+# Note: Because PIB shows a clear upwards trend, we want to take quarter-on-quarter growth rates,
+# Note that if we regress non-stationary series on each other, we end up with spurious regression results.
 plot(ts_pc(PIB))
 lines(PIB*0)
 graphics.off()
@@ -170,10 +165,9 @@ BaroQ.l <- lag(BaroQ, 1)
 
 ## PIB vs Baro ----
 
-# Again, because PIB has just one value for the first day of each quarter, and
-# Baro has one value for the first day of each month, we need to convert the
-# xts objects into ts objects to make the implicit missing values visible
-# as explicit NA values, and before plotting, we have to remove the NAs again.
+# PIB has one value for the first day of each quarter, and Baro has one for the first day of each month,
+# To make implicit missings visible as NAs, convert xts to ts objects.
+# Before plotting, remove the NAs with na.omit().
 p <- ts_df(
   ts_span(
     ts_c(

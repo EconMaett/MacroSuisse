@@ -8,31 +8,38 @@ daniel.kaufmann@unine.ch
 readme.txt for replication files
 -----------------------------------------------------------------------------------------------
 Changes
-I created an R project. Therefore the paths to the data and graphs become shorter and independent from the author.
+I use an R project to make the file paths shorter and independent from the user [Bryan, Jennifer, et al.](https://rstats.wtf/projects).
 
-I use tidyverse packages for data handling. 
-The core tidyverse packages (dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr) are loaded automatically.
-Hence I load data with either readr::read_delim() instead of base::read.csv() or
-readxl::read_excel() instead of xlsx::read.xlsx().
+I use the tidyverse to import the data [Wickham, Hadley](https://r4ds.hadley.nz/data-import), hence
+base::read.csv() becomes readr::read_delim() and xlsx::read.xlsx() becomes readxl::read_excel().
 
-Sometimes the links to access the data have changed. I have updated those.
+Note that the tidyverse functions load the data as tibble instead of data.frame objects. 
+When a single column of a tibble is selected, it remains a column-vector and is not converted to a row-vector, meaning you have to use dplyr::pull() to convert it first.
 
-Because the tsbox::ts_ggplot() function is not working anymore, I have used ggplot2::ggplot() instead.
-Note that sometimes I had to convert xts objects into ts objects before combining them with tsbox::ts_c()
-to make implicit missing values visible as NAs, so that time series with different numbers of observations per period
-can be combined in a single data frame.
-Before plotting, I removed the NAs again.
+[Core tidyverse](https://www.tidyverse.org/packages/) packages (dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr) are loaded with library(tidyverse).
 
-I include more years on the x-axes in plots
-I add the source of the data to the caption
-I always add a zero-line to the plots
-In ggplot functions, the deprecated argument "size" has been replaced with "linewidth".
+Packages that are not used in the scripts are not loaded.
 
-When possible, I include the legends in the title, using the ggtext package.
+If the links to the data have changed they have been updated.
 
-I also replaced ----- with **** so that the dashes may indicate the document outline (Ctrl + Shift + O).
+tsbox::ts_ggplot() is not working and has been replaced with ggplot2::ggplot().
 
-I use the "styler" package to format the scripts according to the Tidyverse Style Guide (based on Google's R style guide).
+To create dataframes for ggplot2::ggplot(), time series objects are collected within tsbox::ts_c() and converted to a data frame in long format
+with ts_df().
+
+If the time stamps of two series do not match, the series are converted from xts to ts objects in order to make implicit missing values explicit as NAs.
+Before plotting, those NAs are deleted with na.omit8).
+
+In all plots, I include the years on the x-axes, and I add a dashed horizontal line at zero. 
+The data source and the creator ([@econmaett](https://twitter.com/econmaett)) are included in the caption.
+
+Inside of ggplot functions, the deprecated "size"-argument is replaced with "linewidth" [Pedersen, Thomas Lin](https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/).
+
+When possible, I include the legends in the title, using the [ggtext](https://wilkelab.org/ggtext/) package.
+
+I also replaced ----- with **** so that the dashes indicate the document outline (Ctrl + Shift + O).
+
+I use the [styler](https://styler.r-lib.org/) package to format the scripts according to the [tidyverse style guide](https://style.tidyverse.org/).
 
 
 Notes

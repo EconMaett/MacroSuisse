@@ -9,7 +9,6 @@
 #
 # Matthias Spichiger, 2023 (matthias.spichiger@bluewin.ch)
 # Based on Daniel Kaufmann, 2020 (daniel.kaufmann@unine.ch)
-# Université de Neuchâtel et KOF Centre de recherches conjoncturelles
 # ************************************************************************
 library(tsbox)
 library(tidyverse)
