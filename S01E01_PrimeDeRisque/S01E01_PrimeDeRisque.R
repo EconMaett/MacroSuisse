@@ -85,8 +85,7 @@ myLines <- c(as.numeric(as.Date("2008-09-15")), as.numeric(as.Date("2015-01-15")
 # ************************************************************************
 # Government & investment-grade corporate bond yields ----
 # ************************************************************************
-p <- ts_df(
-  ts_span(
+p <- ts_df(ts_span(
     ts_c(
       `Confédération` = Gov1,
       `Entreprises (notation AA-AAA)` = AA1,

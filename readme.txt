@@ -24,8 +24,7 @@ If the links to the data have changed they have been updated.
 
 tsbox::ts_ggplot() is not working and has been replaced with ggplot2::ggplot().
 
-To create dataframes for ggplot2::ggplot(), time series objects are collected within tsbox::ts_c() and converted to a data frame in long format
-with ts_df().
+To create dataframes for ggplot2::ggplot(), time series objects are collected within tsbox::ts_c() and converted to a data frame in long format with tsbox::ts_df().
 
 If the time stamps of two series do not match, the series are converted from xts to ts objects in order to make implicit missing values explicit as NAs.
 Before plotting, those NAs are deleted with na.omit8).
