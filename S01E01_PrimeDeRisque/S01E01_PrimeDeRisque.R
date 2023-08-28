@@ -98,15 +98,14 @@ p <- ts_df(ts_span(
   geom_line(linewidth = 1) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
   scale_x_date(date_breaks = "1 year", date_labels = "%y") +
+  scale_y_continuous(limits = c(-2, 4), breaks = c(-2, -1, 0, 1, 2, 3, 4)) +
   labs(
     title = "Rendements des obligations à 1 ans (en %)",
     subtitle = "<span style = 'color: black;'>Confédération</span>, <span style = 'color: #1B9E77;'>Entreprises (AA-AAA)</span>, <span style = 'color: #D95F02;'>Entreprises (BBB-AAA)</span>",
     caption = "@econmaett. Source de données: SIX",
     x = "", y = ""
   ) +
-  theme_minimal() +
   scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("black", "#1B9E77", "#D95F02")) +
   theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
   guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
   theme(legend.title = element_blank()) +

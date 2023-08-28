@@ -53,8 +53,6 @@ Comp <- read_excel(path = "S01E04_Prix/IPC_Manuelx.xlsx", sheet = "Components")
 head(Comp) # Code, PosNo, PosType, Level, Position_D, Missing, Weight 
 
 Prix <- xts(t(Prix[1:3, 8:ncol(Prix)]), order.by = Date)
-plot(Prix)
-graphics.off()
 
 Type    <- Comp$PosType
 Weight  <- as.numeric(Comp$Weight)
@@ -70,8 +68,6 @@ Missing[is.na(Missing)] <- 0
 Baseline <- ts_span(calcIndex(Index, Weight, "2015-12-01"), "2010-12-01")
 Counterf <- ts_span(calcIndex(Index[, Missing == 0], Weight[Missing == 0], "2015-12-01"), "2010-12-01")
 
-plot(ts_c(Baseline, Counterf, Prix[, 1]))
-graphics.off()
 
 # ************************************************************************
 # Create charts ----

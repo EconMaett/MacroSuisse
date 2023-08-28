@@ -60,7 +60,7 @@ for (i in seq_along(urls)) {
 PIB <- read_excel(
   path = "S01E02_BarometreMondial/PIBSuisse.xlsx",
   sheet = "real_q",
-  range = cell_limits(c(11, 1), c(NA, NA)) # Specify open rectangle, upper left = A11
+  range = cell_limits(ul = c(11, 1), lr = c(NA, NA)) # Specify open rectangle, upper left = A11
 )
 
 # Date: Year, first month of quarter, first day
@@ -71,14 +71,8 @@ PIB <- PIB |>
 
 # Create an xts object
 PIB <- xts(x = as.numeric(PIB$PIB), order.by = PIB$Date)
-plot(PIB)
-graphics.off()
-
 # Note: Because PIB shows a clear upwards trend, we want to take quarter-on-quarter growth rates,
 # Note that if we regress non-stationary series on each other, we end up with spurious regression results.
-plot(ts_pc(PIB))
-lines(PIB*0)
-graphics.off()
 
 ## Baro ----
 # Leading KOF global barometer
@@ -90,11 +84,6 @@ Baro <- Baro |>
 
 # Create time series (use aggregate GDP and the Barom leading indicator)
 Baro <- xts(x = as.numeric(Baro$globalbaro_leading), order.by = Baro$Date)
-
-plot(Baro)
-lines(Baro*0+100)
-graphics.off()
-
 # Note that such survey indices are typically designed to be stationary.
 
 # Normalize the barometer and then scale it to the GDP growth rates
@@ -109,7 +98,7 @@ sdBaro <- as.numeric(sqrt(var(Baro, na.rm = TRUE)))
 Baro   <- ((Baro - mBaro) / sdBaro) * sdPIB + mPIB
 
 
-## Vol ----
+## Volatility ----
 # VSMI index is a measure of the volatility of the Swiss Market Index SMI
 Vol <- read_delim(file = "S01E02_BarometreMondial/VSMI.csv", delim = ";")
 head(Vol) # Date [DD.MM.YYYY], ISN, Indexvalue
@@ -126,8 +115,6 @@ Vol <- xts(x = as.numeric(Vol$Indexvalue), order.by = Vol$Date)
 Vol <- ts_frequency(Vol, to = "quarter", aggregate = "mean", na.rm = TRUE)
 Vol <- ts_span(Vol, startDate)
 
-plot(Vol)
-graphics.off()
 
 # Normalize the VSMI in the same way as the barometer
 mVol    <- as.numeric(mean(Vol, na.rm = TRUE))
@@ -136,16 +123,13 @@ sdVol   <- as.numeric(sqrt(var(Vol, na.rm = TRUE)))
 # VSMI' = {(VSMI - E[VSMI])/SD[VSMI]}*SD[PIB] + E[PIB]
 VolNorm <- (Vol - mVol) / sdVol * sdPIB + mPIB
 
-plot(ts_pc(PIB), col = "black")
-lines(Baro, col = "blue")
-lines(VolNorm, col = "red")
-lines(PIB*0, col = "black")
+
 # Now that we have normalized both the barometer and the SMI volatility to have the
 # same mean and standard deviation as the quarter-on-quarter growth rates of GDP (in %),
 # we can see how the series move together.
 # There is a negative relationship between stock market volatility and GDP growth rates
 # and a positive relationship between the leading barometer and GDP growth rates.
-graphics.off()
+
 
 # To compute the correlation between the leading barometer and GDP growth rates,
 # we need to change the barometer to a quarterly frequency by aggregating over the mean.
@@ -235,7 +219,7 @@ p <- ts_df(
   theme(panel.background = element_blank()) +
   theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
   theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", size = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
   theme(plot.subtitle = element_markdown(), legend.position = "none")
 
 p
@@ -292,15 +276,6 @@ p
 ggsave(filename = "S01E02_BarometreMondial/PIBPrevision.png", width = 8, height = 4)
 graphics.off()
 
-# Plot the pseudo-performance
-plot(Forecast$x, col = "black")
-lines(Forecast$fitted, col = "blue")
-lines(Forecast$residuals, col = "red")
-lines(Forecast$x * 0, col = "darkgrey")
-graphics.off()
-
-# Note: The performance could be improved if we included lags of GDP growth rates,
-# lags of the barometer, etc.
 
 # # ************************************************************************
 # Simulate the forecast density ----
@@ -322,7 +297,7 @@ H       <- length(Forecast$mean)
 # forecast errors
 SimFcst[1, ] <- rnorm(n = NSim, mean = fcsth[H - 1], sd = sqrt(sigh2[H - 1]))
 SimFcst[2, ] <- rnorm(n = NSim, mean = fcsth[H], sd = sqrt(sigh2[H]))
-SimFcst <- xts((SimFcst), order.by = as.Date(c("2023-10-01", "2024-01-01")))
+SimFcst      <- xts((SimFcst), order.by = as.Date(c("2023-10-01", "2024-01-01")))
 
 # Compute the probability of a negative growth rate
 PNeg2023Q1 <- mean(SimFcst[1, ] < 0)

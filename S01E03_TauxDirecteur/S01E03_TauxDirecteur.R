@@ -58,8 +58,6 @@ Monet <- Monet |>
   rename(LIB3M = `3M0`)
 
 Monet <- xts(x = Monet[, c("SARON", "LIB3M")], order.by = Monet$Date)
-plot(Monet)
-graphics.off()
 
 ### Obligations ----
 Oblig <- read_delim(file = "S01E03_TauxDirecteur/Obligations.csv", delim = ";", skip = 2)
@@ -71,8 +69,6 @@ Oblig <- Oblig |>
   rename(Conf10 = `10J0`, Manuf8 = IKH, Foreign8 = AAA)
 
 Oblig <- ts_frequency(xts(x = Oblig[, c("Conf10", "Manuf8", "Foreign8")], order.by = Oblig$Date), to = "month", aggregate = "mean", na.rm = TRUE)
-plot(Oblig)
-graphics.off()
 
 ### TauxCrédits ----
 Credit2 <- read_delim(file = "S01E03_TauxDirecteur/TauxCredits.csv", delim = ";", skip = 2)
@@ -85,8 +81,7 @@ Credit2 <- Credit2 |>
   rename(Courant = K, Invest = FI)
 
 Credit2 <- xts(x = Credit2[, c("Courant", "Invest")], order.by = Credit2$Date)
-plot(Credit2)
-graphics.off()
+
 
 ### TauxDirecteur ----
 Direct <- read_delim(file = "S01E03_TauxDirecteur/TauxDirecteur.csv", delim = ";", skip = 2)
@@ -99,8 +94,6 @@ Direct <- Direct |>
   rename(Direct = LZ, Infer = UG0, Super = OG0)
 
 Direct <- xts(x = Direct[, c("Direct", "Infer", "Super")], order.by = Direct$Date)
-plot(Direct)
-graphics.off()
 
 ### TauxOperationsNouvelles ----
 Credit <- read_delim(file = "S01E03_TauxDirecteur/TauxOperationsNouvelles.csv", delim = ";", skip = 2)
@@ -114,8 +107,6 @@ Credit <- Credit |>
   rename(Hypo = MV, Epargne = S1, Terme = `33`)
 
 Credit <- xts(x = Credit[, c("Hypo", "Epargne", "Terme")], order.by = Credit$Date)
-plot(Credit)
-graphics.off()
 
 ## Combine the data ----
 Taux <- ts_span(
@@ -125,9 +116,6 @@ Taux <- ts_span(
   start = startDate
 )
 
-plot(Taux)
-graphics.off()
-
 # Before 2019, there was a target range instead of a policy rate. Take the middle of the
 # target range
 Taux <- Taux |> 
@@ -136,8 +124,6 @@ Taux <- Taux |>
   mutate(Direct = if_else(is.na(Direct), (Super + Infer) / 2, Direct))
 
 Taux <- xts(x = Taux[, -c(1)], order.by = Taux$time)
-plot(Taux)
-graphics.off()
 
 
 # ************************************************************************
