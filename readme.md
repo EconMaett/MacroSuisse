@@ -1,11 +1,8 @@
 # Macro-éCHo
 
 Matthias Spichiger - matthias.spichiger@bluewin.ch
-
 Based on Daniel Kaufmann, émissions "Macro-éCHo", Université de Neuchâtel
-
 daniel.kaufmann@unine.ch
-
 `readme.md` for replication files
 
 
@@ -19,9 +16,7 @@ daniel.kaufmann@unine.ch
   When a single column of a `tibble` is selected, it remains a column-vector and is not transposed to a row-vector, meaning you have to use `dplyr::pull()` before applying functions that use row-vectors as input.
 
 - The [Core tidyverse](https://www.tidyverse.org/packages/) packages (`dplyr`, `forcats`, `ggplot2`, `lubridate`, `purrr`, `readr`, `stringr`, `tibble`, and `tidyr`) are loaded in one go with `library(tidyverse)`.
-
   Note that the non-core `tidyverse` package `readxl` has to be loaded separately with `load(readxl)`
-
   Packages that are not used in the scripts are not loaded.
 
 - If the links to the data have changed they have been updated.
@@ -37,9 +32,9 @@ To create data frames for `ggplot2::ggplot()`, time series objects are collected
 
 - The data source and the creator ([@econmaett](https://twitter.com/econmaett)) are included in the caption.
 
-- Inside of ggplot functions, the deprecated "size"-argument is replaced with "linewidth" (See [Pedersen, Thomas Lin](https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/)).
+- Inside of ggplot functions, the deprecated `size`-argument is replaced with `linewidth` (See [Pedersen, Thomas Lin](https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/)).
 
-- When possible, I include the legends in the title, using the [ggtext](https://wilkelab.org/ggtext/) package.
+- Legends are included in the title, using the [ggtext](https://wilkelab.org/ggtext/) package.
 
 - I replaced `----` with `****` so that the dashes indicate the **document outline** (`Ctrl + Shift + O`).
 
