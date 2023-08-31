@@ -1,14 +1,3 @@
----
-title: "readme"
-author: "Matthias Spichiger"
-date: "2023-08-31"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # Macro-éCHo
 
 Matthias Spichiger - matthias.spichiger@bluewin.ch
