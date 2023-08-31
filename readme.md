@@ -6,40 +6,42 @@ Based on Daniel Kaufmann, émissions "Macro-éCHo", Université de Neuchâtel
 
 daniel.kaufmann@unine.ch
 
-readme.rmd for replication files
+`readme.md` for replication files
 
 
 ## Changes
 
-- I use an R project to make the file paths shorter and independent from the user [Bryan, Jennifer, et al.](https://rstats.wtf/projects).
+- Following [Bryan, Jennifer, et al.](https://rstats.wtf/projects), I use an R project to make the file paths shorter and independent from the user .
 
-- I use the tidyverse to import the data [Wickham, Hadley](https://r4ds.hadley.nz/data-import), hence `base::read.csv()` becomes `readr::read_delim()` and `xlsx::read.xlsx()` becomes `readxl::read_excel()`.
+- Following [Wickham, Hadley](https://r4ds.hadley.nz/data-import), I use the `tidyverse` to import the data , hence `base::read.csv()` became `readr::read_delim()` and `xlsx::read.xlsx()` became `readxl::read_excel()`.
 
-  Note that the tidyverse functions load the data as tibble instead of data.frame objects. 
-  When a single column of a tibble is selected, it remains a column-vector and is not converted to a row-vector, meaning you have to use `dplyr::pull()` to convert it first.
+  Note that the `tidyverse` functions load data as `tibble` instead of `data.frame` objects. 
+  When a single column of a `tibble` is selected, it remains a column-vector and is not transposed to a row-vector, meaning you have to use `dplyr::pull()` before applying functions that use row-vectors as input.
 
-- [Core tidyverse](https://www.tidyverse.org/packages/) packages (dplyr, forcats, ggplot2, lubridate, purrr, readr, stringr, tibble, tidyr) are loaded with `library(tidyverse)`.
+- The [Core tidyverse](https://www.tidyverse.org/packages/) packages (`dplyr`, `forcats`, `ggplot2`, `lubridate`, `purrr`, `readr`, `stringr`, `tibble`, and `tidyr`) are loaded in one go with `library(tidyverse)`.
 
-Packages that are not used in the scripts are not loaded.
+  Note that the non-core `tidyverse` package `readxl` has to be loaded separately with `load(readxl)`
 
-If the links to the data have changed they have been updated.
+  Packages that are not used in the scripts are not loaded.
+
+- If the links to the data have changed they have been updated.
 
 - `tsbox::ts_ggplot()` is not working and has been replaced with `ggplot2::ggplot()`.
 
-To create dataframes for `ggplot2::ggplot()`, time series objects are collected within `tsbox::ts_c()` and converted to a data frame in long format with `tsbox::ts_df()`.
+To create data frames for `ggplot2::ggplot()`, time series objects are collected within `tsbox::ts_c()` and converted to a data frame in long format with `tsbox::ts_df()`.
 
-- If the time stamps of two series do not match, the series are converted from xts to ts objects in order to make implicit missing values explicit as NAs.
-  Before plotting, those NAs are deleted with `base::na.omit()`.
+- If the time stamps of two series do not match, the series are converted from `xts` to `ts` objects in order to make implicit missing values explicit as `NA`s.
+  Before plotting, those `NA`s are deleted with `base::na.omit()`.
 
 - In all plots, I include the years on the x-axes, and I add a dashed horizontal line at zero. 
 
 - The data source and the creator ([@econmaett](https://twitter.com/econmaett)) are included in the caption.
 
-- Inside of ggplot functions, the deprecated "size"-argument is replaced with "linewidth" [Pedersen, Thomas Lin](https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/).
+- Inside of ggplot functions, the deprecated "size"-argument is replaced with "linewidth" (See [Pedersen, Thomas Lin](https://www.tidyverse.org/blog/2022/08/ggplot2-3-4-0-size-to-linewidth/)).
 
 - When possible, I include the legends in the title, using the [ggtext](https://wilkelab.org/ggtext/) package.
 
-- I also replaced `----` with `****` so that the dashes indicate the document outline (`Ctrl + Shift + O`).
+- I replaced `----` with `****` so that the dashes indicate the **document outline** (`Ctrl + Shift + O`).
 
 - I use the [styler](https://styler.r-lib.org/) package to format the scripts according to the [tidyverse style guide](https://style.tidyverse.org/).
 
