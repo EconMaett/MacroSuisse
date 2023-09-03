@@ -3,12 +3,8 @@
 # Est-ce qu'ils suivent les instructions du directeur?"
 # ************************************************************************
 # Video available on www.youtube.com/channel/UCJpACBsnn1eQTObWz5LniGg
-#
-# Feel free to copy, adapt, and use this code for your own purposes at
-# your own risk.
-#
-# Matthias Spichiger, 2023 (matthias.spichiger@bluewin.ch)
-# Based on Daniel Kaufmann, 2020 (daniel.kaufmann@unine.ch)
+# Feel free to copy, adapt, and use this code for your own purposes.
+# Matthias Spichiger (matthias.spichiger@bluewin.ch)
 # ************************************************************************
 library(tsbox)
 library(tidyverse)
