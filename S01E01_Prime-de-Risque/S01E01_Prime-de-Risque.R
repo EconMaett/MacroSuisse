@@ -12,6 +12,8 @@ library(readxl)
 library(ggtext)
 
 startDate <- "2007-06-01"
+chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+
 
 # ************************************************************************
 # Compute risk premia ----
@@ -24,16 +26,16 @@ urls <- c(
   "https://www.six-group.com/exchanges/downloads/indexdata/hsb_maturity_dom_non_gov_rating_sbi_y.csv"
 )
 
-names <- c("Defaults_OFS.xlsx", "ObligationsConf.csv", "ObligationsEnt.csv")
+names <- c("Defaults-OFS.xlsx", "Obligations-Confederation.csv", "Obligations-Entreprises.csv")
 
 # Ideally, you would use a tryCatch statement here
 for (i in seq_along(urls)) {
-  download.file(url = urls[i], destfile = paste0("S01E01_PrimeDeRisque/", names[i]), mode = "wb", quiet = TRUE)
+  download.file(url = urls[i], destfile = paste0("S01E01_Prime-de-Risque/", names[i]), mode = "wb", quiet = TRUE)
 }
 
-Gov      <- read_delim(file = "S01E01_PrimeDeRisque/ObligationsConf.csv", delim = ";", skip = 4)
-NonGov   <- read_delim(file = "S01E01_PrimeDeRisque/ObligationsEnt.csv", delim = ";", skip = 4)
-Defaults <- read_excel(path = "S01E01_PrimeDeRisque/Defaults_OFS.xlsx", sheet = "T6.2.3.1", skip = 1)
+Gov      <- read_delim(file = "S01E01_Prime-de-Risque/Obligations-Confederation.csv", delim = ";", skip = 4)
+NonGov   <- read_delim(file = "S01E01_Prime-de-Risque/Obligations-Entreprises.csv", delim = ";", skip = 4)
+Defaults <- read_excel(path = "S01E01_Prime-de-Risque/Defaults-OFS.xlsx", sheet = "T6.2.3.1", skip = 1)
 
 # Beginning of default procedures (Ouverture des procedures de faillite)
 # I calculate the growth rate of default procedures as a share of active firms in 2017
@@ -114,7 +116,7 @@ p <- ts_df(ts_span(
 
 p
 
-ggsave(filename = "S01E01_PrimeDeRisque/Obligations.png", width = 8, height = 4)
+ggsave(filename = "S01E01_Prime-de-Risque/Fig_Obligations.png", width = 8, height = 4)
 graphics.off()
 
 # ************************************************************************
@@ -160,7 +162,7 @@ p
 # Le risque d’être en faillite, et donc la prime de risque, 
 # augmente dans des crises économiques. 
 # Une «courbe de fièvre» avec laquelle on peut rapidement détecter des crisés économiques
-ggsave(filename = "S01E01_PrimeDeRisque/PrimesDeRisque.png", width = 8, height = 4)
+ggsave(filename = "S01E01_Prime-de-Risque/Fig_Primes-de-Risque.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -206,6 +208,6 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E01_PrimeDeRisque/ProcFaillitePrime.png", width = 8, height = 4)
+ggsave(filename = "S01E01_Prime-de-Risque/Fig_Procedures-de-Faillite-et-Prime-de-Risque.png", width = 8, height = 4)
 graphics.off()
 # END

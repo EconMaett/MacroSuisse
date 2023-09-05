@@ -10,6 +10,8 @@ library(xts)
 library(readxl)
 library(ggtext)
 
+chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+
 # ideally put these series into a separate file and access them with the source() comand.
 calcIndex <- function(series, weights, baseY) {
   # Useful function to calculate weighted mean of indexed series
@@ -102,7 +104,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E04_Prix/PrixImpute.png", width = 8, height = 4)
+ggsave(filename = "S01E04_Prix/Fig_Prix-Impute.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -139,6 +141,6 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E04_Prix/Inflation.png", width = 8, height = 4)
+ggsave(filename = "S01E04_Prix/Fig_Inflation.png", width = 8, height = 4)
 graphics.off()
 # END

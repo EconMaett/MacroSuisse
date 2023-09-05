@@ -13,6 +13,7 @@ library(ggtext)
 
 startDate <- "2000-01-01"
 endDate   <- round_date(x = today(), unit = "month")
+chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
 
 # ************************************************************************
 # Download the data ----
@@ -31,20 +32,20 @@ urls <- c(
 )
 
 names <- c(
-  "MarchéMonétaire.csv",
+  "Marche-Monetaire.csv",
   "Obligations.csv",
-  "TauxCredits.csv",
-  "TauxDirecteur.csv",
-  "TauxOperationsNouvelles.csv"
+  "Taux-Credits.csv",
+  "Taux-Directeur.csv",
+  "Taux-Operations-Nouvelles.csv"
 )
 
 # Ideally wrap this in a tryCatch() statement
 for (i in seq_along(names)) {
-  download.file(url = urls[i], destfile = paste0("S01E03_TauxDirecteur/", names[i]), method = "curl", quiet = FALSE)
+  download.file(url = urls[i], destfile = paste0("S01E03_Taux-Directeur/", names[i]), method = "curl", quiet = FALSE)
 }
 
 ### MarchéMonétaire ----
-Monet <- read_delim(file = "S01E03_TauxDirecteur/MarchéMonétaire.csv", delim = ";", skip = 2)
+Monet <- read_delim(file = "S01E03_Taux-Directeur/Marche-Monetaire.csv", delim = ";", skip = 2)
 
 # Chose 1 day SARON and 3-month LIBOR
 Monet <- Monet |>
@@ -56,7 +57,7 @@ Monet <- Monet |>
 Monet <- xts(x = Monet[, c("SARON", "LIB3M")], order.by = Monet$Date)
 
 ### Obligations ----
-Oblig <- read_delim(file = "S01E03_TauxDirecteur/Obligations.csv", delim = ";", skip = 2)
+Oblig <- read_delim(file = "S01E03_Taux-Directeur/Obligations.csv", delim = ";", skip = 2)
 
 # Select 10-year CHF government bonds, 8-year Swiss commercial bonds from industry, 8-year foreign CHF commercial bonds, AAA rated
 Oblig <- Oblig |>
@@ -67,7 +68,7 @@ Oblig <- Oblig |>
 Oblig <- ts_frequency(xts(x = Oblig[, c("Conf10", "Manuf8", "Foreign8")], order.by = Oblig$Date), to = "month", aggregate = "mean", na.rm = TRUE)
 
 ### TauxCrédits ----
-Credit2 <- read_delim(file = "S01E03_TauxDirecteur/TauxCredits.csv", delim = ";", skip = 2)
+Credit2 <- read_delim(file = "S01E03_Taux-Directeur/Taux-Credits.csv", delim = ";", skip = 2)
 
 # Select current account advance facilities and investment loans with fixed interest rates
 Credit2 <- Credit2 |>
@@ -80,7 +81,7 @@ Credit2 <- xts(x = Credit2[, c("Courant", "Invest")], order.by = Credit2$Date)
 
 
 ### TauxDirecteur ----
-Direct <- read_delim(file = "S01E03_TauxDirecteur/TauxDirecteur.csv", delim = ";", skip = 2)
+Direct <- read_delim(file = "S01E03_Taux-Directeur/Taux-Directeur.csv", delim = ";", skip = 2)
 
 # Select SNB policy rate, lower and upper target range for 3-month CHF LIBOR
 Direct <- Direct |>
@@ -92,7 +93,7 @@ Direct <- Direct |>
 Direct <- xts(x = Direct[, c("Direct", "Infer", "Super")], order.by = Direct$Date)
 
 ### TauxOperationsNouvelles ----
-Credit <- read_delim(file = "S01E03_TauxDirecteur/TauxOperationsNouvelles.csv", delim = ";", skip = 2)
+Credit <- read_delim(file = "S01E03_Taux-Directeur/Taux-Operations-Nouvelles.csv", delim = ";", skip = 2)
 
 Credit <- Credit |>
   mutate(Date = as.Date(paste0(Date, "-01"))) |>
@@ -159,7 +160,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E03_TauxDirecteur/TauxDirecteur.png", width = 8, height = 4)
+ggsave(filename = "S01E03_Taux-Directeur/Fig_Taux-Directeur.png", width = 8, height = 4)
 graphics.off()
 
 ## Recession 2002 ----
@@ -196,7 +197,7 @@ p <- ts_df(
   theme(plot.subtitle = element_markdown(), legend.position = "none")
 p
 
-ggsave(filename = "S01E03_TauxDirecteur/AutresTaux2001.png", width = 8, height = 4)
+ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2001.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -238,7 +239,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E03_TauxDirecteur/AutresTaux2008.png", width = 8, height = 4)
+ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2008.png", width = 8, height = 4)
 graphics.off()
 
 # Taux négatifs
@@ -275,7 +276,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E03_TauxDirecteur/AutresTaux2015.png", width = 8, height = 4)
+ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2015.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -313,6 +314,6 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E03_TauxDirecteur/AutresTauxCorona.png", width = 8, height = 4)
+ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-Corona.png", width = 8, height = 4)
 graphics.off()
 # END

@@ -12,6 +12,8 @@ library(xts)
 library(readxl)
 library(ggtext)
 
+chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+
 # Ideally put the functions in a separate file and access them with the source() command
 getForecastVariance <- function(fcst) {
   # Function to extract forecast error variance from a forecast object
@@ -40,11 +42,11 @@ urls <- c(
   "https://www.six-group.com/exchanges/downloads/indexdata/h_vsmi_30.csv"
 )
 
-names <- c("Barometre.xlsx", "PIBSuisse.xlsx", "VSMI.csv")
+names <- c("Barometre-Mondial.xlsx", "PIB-Suisse.xlsx", "VSMI.csv")
 
 # Ideally a tryCatch() statement
 for (i in seq_along(urls)) {
-  download.file(url = urls[i], destfile = paste0("S01E02_BarometreMondial/", names[i]), mode = "wb", quiet = FALSE, method = "curl")
+  download.file(url = urls[i], destfile = paste0("S01E02_Barometre-Mondial/", names[i]), mode = "wb", quiet = FALSE, method = "curl")
 }
 
 # ************************************************************************
@@ -54,7 +56,7 @@ for (i in seq_along(urls)) {
 ## GDP ----
 # Quarterly real GDP, adjusted for seasonal and holiday effects and sport events
 PIB <- read_excel(
-  path = "S01E02_BarometreMondial/PIBSuisse.xlsx",
+  path = "S01E02_Barometre-Mondial/PIB-Suisse.xlsx",
   sheet = "real_q",
   range = cell_limits(ul = c(11, 1), lr = c(NA, NA)) # Specify open rectangle, upper left = A11
 )
@@ -72,7 +74,7 @@ PIB <- xts(x = as.numeric(PIB$PIB), order.by = PIB$Date)
 
 ## Baro ----
 # Leading KOF global barometer
-Baro <- read_excel(path = "S01E02_BarometreMondial/Barometre.xlsx", sheet = "Sheet1")
+Baro <- read_excel(path = "S01E02_Barometre-Mondial/Barometre-Mondial.xlsx", sheet = "Sheet1")
 
 Baro <- Baro |> 
   mutate(Date = as.Date(paste0(date, "-01"))) |> 
@@ -96,7 +98,7 @@ Baro   <- ((Baro - mBaro) / sdBaro) * sdPIB + mPIB
 
 ## Volatility ----
 # VSMI index is a measure of the volatility of the Swiss Market Index SMI
-Vol <- read_delim(file = "S01E02_BarometreMondial/VSMI.csv", delim = ";")
+Vol <- read_delim(file = "S01E02_Barometre-Mondial/VSMI.csv", delim = ";")
 head(Vol) # Date [DD.MM.YYYY], ISN, Indexvalue
 
 Vol <- Vol |> 
@@ -182,7 +184,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E02_BarometreMondial/PIBetBaro.png", width = 8, height = 4)
+ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-et-Barometre-Mondial.png", width = 8, height = 4)
 graphics.off()
 
 ## BIP vs Baro & VolNorm ----
@@ -220,7 +222,7 @@ p <- ts_df(
 
 p
 
-ggsave(filename = "S01E02_BarometreMondial/PIBetBaroVol.png", width = 8, height = 4)
+ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-Barometre-Volatilite.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -269,7 +271,7 @@ p <- autoplot(Forecast, fan = TRUE) +
 
 p
 
-ggsave(filename = "S01E02_BarometreMondial/PIBPrevision.png", width = 8, height = 4)
+ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-Prevision.png", width = 8, height = 4)
 graphics.off()
 
 
