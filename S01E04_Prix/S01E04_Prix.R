@@ -14,7 +14,7 @@ library(ggtext)
 start_date <- "2000-01-01"
 end_date   <- "2020-04-01"
 # floor_date(x = today(), unit = "month") - months(1) # Has to be last observation of CPI
-chrecdp   <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+chrecdp   <- read_csv(file = "Recession-Dates/Recession-Dates_CEPR_EA_Monthly_Midpoint.csv")
 
 # ideally put these series into a separate file and access them with the source() comand.
 calcIndex <- function(series, weights, baseY) {

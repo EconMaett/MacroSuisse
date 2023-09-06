@@ -13,7 +13,7 @@ library(ggtext)
 
 start_date <- "2000-01-01"
 end_date   <- round_date(x = today(), unit = "month")
-chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_CEPR_EA_Monthly_Midpoint.csv")
 
 # ************************************************************************
 # Download the data ----

@@ -12,7 +12,7 @@ library(readxl)
 library(ggtext)
 
 start_date <- "2007-06-01"
-chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_CEPR_EA_Monthly_Midpoint.csv")
 
 # ************************************************************************
 # Compute risk premia ----

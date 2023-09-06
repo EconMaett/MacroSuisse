@@ -12,7 +12,7 @@ library(xts)
 library(readxl)
 library(ggtext)
 
-chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_CEPR_EA_Monthly_Midpoint.csv")
 start_date <- "1999-01-01"
 # Last date should be first date of last quarter
 end_date   <- round_date(x = today(), unit = "quarter") - months(3)
