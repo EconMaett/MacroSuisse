@@ -11,9 +11,9 @@ library(tidyverse)
 library(xts)
 library(ggtext)
 
-startDate <- "2000-01-01"
-endDate   <- round_date(x = today(), unit = "month")
-chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+start_date <- "2000-01-01"
+end_date   <- round_date(x = today(), unit = "month")
+chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
 
 # ************************************************************************
 # Download the data ----
@@ -110,7 +110,7 @@ Taux <- ts_span(
   ts_c(
     Monet, Oblig, Direct, Credit, Credit2
   ),
-  start = startDate
+  start = start_date
 )
 
 # Before 2019, there was a target range instead of a policy rate. Take the middle of the
@@ -132,72 +132,67 @@ p <- ts_df(
   ts_c(
     `Taux directeur` = Taux$Direct,
     `Swiss Average Rate Overnight (SARON)` = ts_span(Taux$SARON, start = "2019-06-01"),
-    `CHF Libor à trois mois` = ts_span(Taux$LIB3M, start = startDate, end = "2019-05-01")
+    `CHF Libor à trois mois` = ts_span(Taux$LIB3M, start = start_date, end = "2019-05-01")
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%y") +
-  theme_minimal() +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_color_manual(
+    breaks = c("Taux directeur", "Swiss Average Rate Overnight (SARON)", "CHF Libor à trois mois"),
+    values = c("#374e8e", "#006d64", "#ac004f")
+  ) +
   labs(
     title = "Taux directeur et taux sur le marché monétaire (en %)",
-    subtitle = "<span style = 'color: black;'>Taux directeur</span>, <span style = 'color: #1B9E77;'>CHF Libor à trois mois</span>,  <span style = 'color: #D95F02;'>Swiss Average Rate Overnight (SARON)</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Taux directeur</span>, <span style = 'color: #006d64;'>CHF Libor à trois mois</span>,  <span style = 'color: #ac004f;'>Swiss Average Rate Overnight (SARON)</span>",
     caption = "@econmaett. Source de données: Banque Nationale Suisse (BNS).",
     x = "", y = ""
   ) +
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "black", "#E7298A", "#E6AB02", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) +
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E03_Taux-Directeur/Fig_Taux-Directeur.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E03_Taux-Directeur/Fig_Taux-Directeur.png", width = 8, height = 4)
 graphics.off()
 
 ## Recession 2002 ----
 p <- ts_df(
   ts_c(
-    `Taux directeur`         = ts_span(Taux$Direct, start = startDate, end = "2004-01-01"),
-    `Conféderation à 10 ans` = ts_span(Taux$Conf10, start = startDate, end = "2004-01-01"),
-    `Entreprises à 8 ans`    = ts_span(Taux$Manuf8, start = startDate, end = "2004-01-01"),
-    `Prêts hypothécairses`   = ts_span(Taux$Hypo, start = startDate, end = "2004-01-01"),
-    `Dépôt d'épargnes`       = ts_span(Taux$Epargne, start = startDate, end = "2004-01-01")
+    `Taux directeur`         = ts_span(Taux$Direct, start = start_date, end = "2004-01-01"),
+    `Conféderation à 10 ans` = ts_span(Taux$Conf10, start = start_date, end = "2004-01-01"),
+    `Entreprises à 8 ans`    = ts_span(Taux$Manuf8, start = start_date, end = "2004-01-01"),
+    `Prêts hypothécairses`   = ts_span(Taux$Hypo, start = start_date, end = "2004-01-01"),
+    `Dépôt d'épargnes`       = ts_span(Taux$Epargne, start = start_date, end = "2004-01-01")
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date(start_date), date("2004-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_color_manual(
+    breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécairses", "Dépôt d'épargnes"), 
+    values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
+    ) +
   labs(
     title = "Taux d'intérêts pendant la recession 2001/2002 (en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>Conféderation à 10 ans</span>, <span style = 'color: #D95F02;'>Dépôt d'épargnes</span>, <span style = 'color: #7570B3;'>Enreprises à 8 ans</span>, <span style = 'color: #E7298A;'>Prêts hypothécaires</span>, <span style = 'color: black;'>Taux directeur</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Taux directeur</span>, <span style = 'color:#006d64;'>Conféderation à 10 ans</span>, <span style = 'color: #ac004f;'>Enreprises à 8 ans</span>, <span style = 'color: #df7c18;'>Prêts hypothécaires</span>, <span style = 'color: #a07bde;'>Dépôt d'épargnes</span>",
     caption = "@econmaett. Source de données: Banque Nationale Suisse (BNS).",
     x = "", y = ""
   ) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "black", "#E6AB02", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) +
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
+
 p
 
-ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2001.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2001.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -211,35 +206,29 @@ p <- ts_df(
     `Dépôts d'épargnes` = ts_span(Taux$Epargne, "2006-01-01", "2010-01-01")
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date("2006-01-01"), date("2010-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_color_manual(
+    breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
+    values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
+  ) +
   labs(
     title = "Taux d'intérêts pendant la recession 2008/2009 (en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>Conféderation à 10 ans</span>, <span style = 'color: #D95F02;'>Dépôt d'épargnes</span>, <span style = 'color: #7570B3;'>Enreprises à 8 ans</span>, <span style = 'color: #E7298A;'>Prêts hypothécaires</span>, <span style = 'color: black;'>Taux directeur</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Taux directeur</span>, <span style = 'color:#006d64;'>Conféderation à 10 ans</span>, <span style = 'color: #ac004f;'>Enreprises à 8 ans</span>, <span style = 'color: #df7c18;'>Prêts hypothécaires</span>, <span style = 'color: #a07bde;'>Dépôt d'épargnes</span>",
     caption = "@econmaett. Source de données: Banque Nationale Suisse (BNS).",
     x = "", y = ""
   ) +
-  theme_minimal() +
-  ylab("") +
-  xlab("") +
-  geom_line(aes(), linewidth = 1) +
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "black", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) +
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2008.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2008.png", width = 8, height = 4)
 graphics.off()
 
 # Taux négatifs
@@ -252,68 +241,65 @@ p <- ts_df(
     `Dépôts d'épargnes` = ts_span(Taux$Epargne, "2013-01-01", "2017-01-01")
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date("2013-01-01"), date("2017-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_color_manual(
+    breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
+    values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
+  ) +
   labs(
     title = "Taux d'intérêts en territoire négatif (en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>Conféderation à 10 ans</span>, <span style = 'color: #D95F02;'>Dépôt d'épargnes</span>, <span style = 'color: #7570B3;'>Enreprises à 8 ans</span>, <span style = 'color: #E7298A;'>Prêts hypothécaires</span>, <span style = 'color: black;'>Taux directeur</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Taux directeur</span>, <span style = 'color:#006d64;'>Conféderation à 10 ans</span>, <span style = 'color: #ac004f;'>Enreprises à 8 ans</span>, <span style = 'color: #df7c18;'>Prêts hypothécaires</span>, <span style = 'color: #a07bde;'>Dépôt d'épargnes</span>",
     caption = "@econmaett. Source de données: Banque Nationale Suisse (BNS).",
     x = "", y = ""
   ) +
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "black", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) +
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2015.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-2015.png", width = 8, height = 4)
 graphics.off()
 
 
 ## Crise Corona ----
 p <- ts_df(
   ts_c(
-    `Taux directeur` = ts_span(Taux$Direct, "2016-01-01", endDate),
-    `Conféderation à 10 ans` = ts_span(Taux$Conf10, "2016-01-01", endDate),
-    `Entreprises à 8 ans` = ts_span(Taux$Manuf8, "2016-01-01", endDate),
-    `Prêts hypothécaires` = ts_span(Taux$Hypo, "2016-01-01", endDate),
-    `Dépôts d'épargnes` = ts_span(Taux$Epargne, "2016-01-01", endDate)
+    `Taux directeur` = ts_span(Taux$Direct, "2016-01-01", end_date),
+    `Conféderation à 10 ans` = ts_span(Taux$Conf10, "2016-01-01", end_date),
+    `Entreprises à 8 ans` = ts_span(Taux$Manuf8, "2016-01-01", end_date),
+    `Prêts hypothécaires` = ts_span(Taux$Hypo, "2016-01-01", end_date),
+    `Dépôts d'épargnes` = ts_span(Taux$Epargne, "2016-01-01", end_date)
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date("2016-01-01"), date(end_date)), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_color_manual(
+    breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
+    values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
+  ) +
   labs(
     title = "Taux d'intérêts pendant la crise Corona (en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>Conféderation à 10 ans</span>, <span style = 'color: #D95F02;'>Dépôt d'épargnes</span>, <span style = 'color: #7570B3;'>Enreprises à 8 ans</span>, <span style = 'color: #E7298A;'>Prêts hypothécaires</span>, <span style = 'color: black;'>Taux directeur</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Taux directeur</span>, <span style = 'color:#006d64;'>Conféderation à 10 ans</span>, <span style = 'color: #ac004f;'>Enreprises à 8 ans</span>, <span style = 'color: #df7c18;'>Prêts hypothécaires</span>, <span style = 'color: #a07bde;'>Dépôt d'épargnes</span>",
     caption = "@econmaett. Source de données: Banque Nationale Suisse (BNS).",
     x = "", y = ""
   ) +
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "black", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) +
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) +
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) +
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-Corona.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E03_Taux-Directeur/Fig_Autres-Taux-Corona.png", width = 8, height = 4)
 graphics.off()
+
 # END

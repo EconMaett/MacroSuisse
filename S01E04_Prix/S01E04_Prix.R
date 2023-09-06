@@ -5,12 +5,16 @@
 # Feel free to copy, adapt, and use this code for your own purposes.
 # Matthias Spichiger (matthias.spichiger@bluewin.ch)
 # ************************************************************************
+library(tidyverse)
 library(tsbox)
 library(xts)
 library(readxl)
 library(ggtext)
 
-chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+start_date <- "2000-01-01"
+end_date   <- "2020-04-01"
+# floor_date(x = today(), unit = "month") - months(1) # Has to be last observation of CPI
+chrecdp   <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
 
 # ideally put these series into a separate file and access them with the source() comand.
 calcIndex <- function(series, weights, baseY) {
@@ -27,10 +31,6 @@ calcIndex <- function(series, weights, baseY) {
   return(Index)
 }
 
-startDate <- "2000-01-01"
-endDate   <- "2020-04-01"
-# floor_date(x = today(), unit = "month") - months(1) # Has to be last observation of CPI
-
 # ************************************************************************
 # Download the data ----
 # ************************************************************************
@@ -41,7 +41,7 @@ download.file(
 )
 
 # Import the data ----
-Date <- seq(from = as.Date("1982-12-01"), to = as.Date(endDate), by = "month")
+Date <- seq(from = as.Date("1982-12-01"), to = as.Date(end_date), by = "month")
 
 # Note that some adjustments have been made manually!
 Prix <- read_excel(path = "S01E04_Prix/IPC_Manuelx.xlsx", sheet = "Main")
@@ -79,32 +79,29 @@ p <- ts_df(
     `IPC (sans categories avec prix imputés en Avril 2020)` = ts_pcy(Counterf)
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date("2010-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
+  scale_color_manual(
+    breaks = c("IPC (officiel)", "PC (propre calcul)", "IPC (sans categories avec prix imputés en Avril 2020)"),
+    values = c("#374e8e", "#006d64", "#ac004f")
+  ) +
   labs(
     title = "Taux d'inflation (par rapport à l'année précédente, en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>IPC (officiel)</span>, <span style = 'color: #D95F02;'>IPC (sans categories avec prix imputés en Avril 2020)</span>",
+    subtitle = "<span style = 'color: #006d64;'>IPC (officiel)</span>, <span style = 'color: #ac004f;'>IPC (sans categories avec prix imputés en Avril 2020)</span>",
     caption = "@econmaett. Source de données: Office fédéral de la statistique (OFS), SIX.",
     x = "", y = ""
   ) + 
-  theme_minimal() + 
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "black", "#E7298A", "#E6AB02", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) + 
-  guides(col = guide_legend(nrow = 1, byrow = TRUE)) + 
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) + 
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E04_Prix/Fig_Prix-Impute.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E04_Prix/Fig_Prix-Impute.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -116,31 +113,28 @@ p <- ts_df(
     `Biens importés` = ts_pcy(ts_span(Prix[, 3], "2015-12-01"))
     )
   ) |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date("2016-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
+  scale_color_manual(
+    breaks = c("IPC", "Biens domestiques", "Biens importés"),
+    values = c("#374e8e", "#006d64", "#ac004f")
+  ) +
   labs(
     title = "Taux d'inflation (par rapport à l'année précédente, en %)",
-    subtitle = "<span style = 'color: #1B9E77;'>Biens domestiques</span>, <span style = 'color: #D95F02;'>Biens importés</span>, <span style = 'color: black;'>IPC</span>",
+    subtitle = "<span style = 'color: #374e8e;'>IPC</span>, <span style = 'color: #006d64;'>Biens domestiques</span>, <span style = 'color: #ac004f;'>Biens importés</span>",
     caption = "@econmaett. Source de données: Office fédéral de la statistique (OFS), SIX.",
     x = "", y = ""
   ) +
-  theme_minimal() + 
-  scale_color_brewer(palette = "Dark2") +
-  scale_color_manual(values = c("#1B9E77", "#D95F02", "black", "#E7298A", "#E6AB02", "black", "#A6761D")) +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) + 
-  guides(col = guide_legend(nrow = 1, byrow = TRUE)) + 
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) + 
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E04_Prix/Fig_Inflation.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E04_Prix/Fig_Inflation.png", width = 8, height = 4)
 graphics.off()
 # END

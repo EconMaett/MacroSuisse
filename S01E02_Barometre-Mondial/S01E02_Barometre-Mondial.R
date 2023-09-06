@@ -12,7 +12,10 @@ library(xts)
 library(readxl)
 library(ggtext)
 
-chrecdp <- read_csv(file = "Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_OECD_CH_Daily_Midpoint.csv")
+start_date <- "1999-01-01"
+# Last date should be first date of last quarter
+end_date   <- round_date(x = today(), unit = "quarter") - months(3)
 
 # Ideally put the functions in a separate file and access them with the source() command
 getForecastVariance <- function(fcst) {
@@ -26,16 +29,11 @@ getForecastVariance <- function(fcst) {
   return(sigh2)
 }
 
-startDate <- "1999-01-01"
-# Last date should be first date of last quarter
-endDate   <- round_date(x = today(), unit = "quarter") - months(3)
 
 # ************************************************************************
 # Download the data ----
 # ************************************************************************
 # Source: https://kof.ethz.ch/fr/previsions-indicateurs/indicateurs/kof-globalbaro.html
-# Baromètre mondial: Les deux indicateurs sont composés des résultats d'enquêtes
-# conjoncturelles menes dans plus de 50 pays.
 urls <- c(
   "https://datenservice.kof.ethz.ch/api/v1/public/ts?keys=ch.kof.globalbaro.coincident,ch.kof.globalbaro.leading,ch.kof.globalbaro.gdp_reference&mime=xlsx&name=date,globalbaro_coincident,globalbaro_leading,gdp_reference",
   "https://www.seco.admin.ch/dam/seco/de/dokumente/Wirtschaft/Wirtschaftslage/VIP%20Quartalssch%C3%A4tzungen/qna_p_csa.xlsx.download.xlsx/qna_p_csa.xlsx",
@@ -111,8 +109,7 @@ Vol <- xts(x = as.numeric(Vol$Indexvalue), order.by = Vol$Date)
 # We aggregate the daily data to quarterly frequency,
 # by aggregating over the mean
 Vol <- ts_frequency(Vol, to = "quarter", aggregate = "mean", na.rm = TRUE)
-Vol <- ts_span(Vol, startDate)
-
+Vol <- ts_span(Vol, start_date)
 
 # Normalize the VSMI in the same way as the barometer
 mVol    <- as.numeric(mean(Vol, na.rm = TRUE))
@@ -121,20 +118,18 @@ sdVol   <- as.numeric(sqrt(var(Vol, na.rm = TRUE)))
 # VSMI' = {(VSMI - E[VSMI])/SD[VSMI]}*SD[PIB] + E[PIB]
 VolNorm <- (Vol - mVol) / sdVol * sdPIB + mPIB
 
-
 # Now that we have normalized both the barometer and the SMI volatility to have the
 # same mean and standard deviation as the quarter-on-quarter growth rates of GDP (in %),
 # we can see how the series move together.
 # There is a negative relationship between stock market volatility and GDP growth rates
 # and a positive relationship between the leading barometer and GDP growth rates.
 
-
 # To compute the correlation between the leading barometer and GDP growth rates,
 # we need to change the barometer to a quarterly frequency by aggregating over the mean.
 BaroQ   <- ts_frequency(Baro, to = "quarter", aggregate = "mean", na.rm = TRUE)
 # Combine the quarter-on-quarter GDP percentage changes, the quarterly barometer, 
 # and its lag
-myDataQ <- data.frame(ts_span(ts_c(ts_pc(PIB), BaroQ, lag(BaroQ, 1)), startDate))
+myDataQ <- data.frame(ts_span(ts_c(ts_pc(PIB), BaroQ, lag(BaroQ, 1)), start_date))
 colnames(myDataQ) <- c("PIB", "Baro", "Baro.l")
 head(myDataQ)
 print(cor(myDataQ[1:dim(myDataQ)[1] - 1, ]))
@@ -156,35 +151,33 @@ p <- ts_df(
       `Croissance du PIB Suisse (en %)` = ts_pc(ts_ts(PIB)),
       `Baromètre mondial (index avancé normalisé)` = ts_ts(Baro)
       ),
-    start = startDate
+    start = start_date
     )
   ) |> 
   na.omit() |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
+  scale_color_manual(
+    breaks = c("Croissance du PIB Suisse (en %)", "Baromètre mondial (index avancé normalisé)"), 
+    values = c("#374e8e", "#006d64")
+    ) +
   labs(
     title = "Activité économique Suisse et barométre mondial",
-    subtitle = "<span style = 'color: #D95F02;'>Croissance du PIB Suisse (en %)</span>, <span style = 'color: #1B9E77;'>Baromètre mondial (index avancé normalisé)</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Croissance du PIB Suisse (en %)</span>, <span style = 'color: #006d64;'>Baromètre mondial (index avancé normalisé)</span>",
     caption = "@econmaett. Source de données: Office fédéral de la statistique (OFS), SIX.",
     x = "", y = ""
   ) + 
-  theme_minimal() + 
-  scale_color_brewer(palette = "Dark2") +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) + 
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) + 
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", linewidth = 0.1)) + 
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-et-Barometre-Mondial.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E02_Barometre-Mondial/Fig_PIB-et-Barometre-Mondial.png", width = 8, height = 4)
 graphics.off()
 
 ## BIP vs Baro & VolNorm ----
@@ -195,34 +188,33 @@ p <- ts_df(
       `Baromètre mondial (index av. norm.)` = ts_ts(Baro),
       `Incertitude marchés financiers (norm.)` = ts_ts(VolNorm)
       ),
-    start = startDate
+    start = start_date
     )
   ) |> 
   na.omit() |> 
-  ggplot(mapping = aes(x = time, y = value, color = id)) +
-  geom_line(linewidth = 1) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%y") +
+  ggplot() +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
+  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
+  scale_color_manual(
+    values = c("#374e8e", "#006d64", "#ac004f"), 
+    breaks = c("Croissance du PIB (en %)", "Baromètre mondial (index av. norm.)", "Incertitude marchés financiers (norm.)")
+    ) +
   labs(
     title = "Données modèle de prévision",
-    subtitle = "<span style = 'color: #D95F02;'>Croissance du PIB (en %)</span>, <span style = 'color: #1B9E77;'>Baromètre mondial (index av. norm.)</span>, <span style = 'color: #7570B3;'>Incertitude marchés financiers (norm.)</span>",
+    subtitle = "<span style = 'color: #374e8e;'>Croissance du PIB (en %)</span>, <span style = 'color: #006d64;'>Baromètre mondial (index av. norm.)</span>, <span style = 'color: #ac004f;'>Incertitude marchés financiers (norm.)</span>",
     caption = "@econmaett. Source de données: Office fédéral de la statistique (OFS), SIX.",
     x = "", y = ""
   ) +
-  scale_color_brewer(palette = "Dark2") +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) + 
-  ggplot2::guides(col = guide_legend(nrow = 2, byrow = TRUE)) + 
-  ggplot2::theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", size = 0.1)) + 
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", linewidth = 0.1, linetype = "dotted"), panel.grid.minor = element_blank()) +
-  theme(plot.subtitle = element_markdown(), legend.position = "none")
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-Barometre-Volatilite.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E02_Barometre-Mondial/Fig_PIB-Barometre-Volatilite.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -231,14 +223,14 @@ graphics.off()
 # ************************************************************************
 # PIB_t = alpha + beta * BAroQnorm_t + gamma * VSMIQnorm_t + epsilon_t
 
-XVars <- ts_span(ts_ts(ts_c(BaroQ, Vol)), startDate, endDate)
-YVars <- ts_span(ts_ts(ts_pc(PIB)), startDate, endDate)
+XVars <- ts_span(ts_ts(ts_c(BaroQ, Vol)), start_date, end_date)
+YVars <- ts_span(ts_ts(ts_pc(PIB)), start_date, end_date)
 
 Model <- Arima(
   y = YVars, 
   order = c(0, 0, 0), 
   include.constant = TRUE, 
-  xreg = XVars[1:(nrow(XVars) - 2), ] # We have two more quarters of input data than we have GDP growth rate observations
+  xreg = XVars[1:(nrow(XVars) - 1), ] # We have two more quarters of input data than we have GDP growth rate observations
   )
 
 # Use the model to generate forecasts
@@ -250,28 +242,24 @@ Forecast <- forecast(
   )
 
 p <- autoplot(Forecast, fan = TRUE) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", show.legend = FALSE) +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
+  geom_rect(data = chrecdp, aes(xmin = decimal_date(recession_start), xmax = decimal_date(recession_end), ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
+  
   scale_x_continuous(limits = c(2000, 2025)) +
-  scale_y_continuous(limits = c(-2, 2)) +
+  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   labs(
     title = "Prévision croissance PIB Suisse (en %)",
     subtitle = "",
     caption = "",
     x = "", y = ""
   ) +
-  theme_minimal() +
-  theme(legend.position = "bottom", legend.margin = margin(0, 0, 0, 0), legend.box.margin = margin(-20, -5, 0, -5)) + 
-  guides(col = guide_legend(nrow = 2, byrow = TRUE)) + 
-  theme(legend.title = element_blank()) +
-  theme(axis.line = element_line(colour = "black", size = 0.1)) + 
-  theme(panel.background = element_blank()) +
-  theme(panel.border = element_rect(linetype = "solid", colour = "black", fill = NA)) + 
-  theme(text = element_text(family = "Palatino")) +
-  theme(panel.grid.major = element_line(colour = "black", size = 0.1, linetype = "dotted"), panel.grid.minor = element_blank())
+  theme_bw() +
+  theme(plot.subtitle = element_markdown(), legend.position = "none") +
+  theme(panel.grid.minor = element_blank())
 
 p
 
-ggsave(filename = "S01E02_Barometre-Mondial/Fig_PIB-Prevision.png", width = 8, height = 4)
+ggsave(plot = p, filename = "S01E02_Barometre-Mondial/Fig_PIB-Prevision.png", width = 8, height = 4)
 graphics.off()
 
 
@@ -300,6 +288,8 @@ SimFcst      <- xts((SimFcst), order.by = as.Date(c("2023-10-01", "2024-01-01"))
 # Compute the probability of a negative growth rate
 PNeg2023Q1 <- mean(SimFcst[1, ] < 0)
 PNeg2023Q2 <- mean(SimFcst[2, ] < 0)
+
+# A nice table would be useful here, together with the point estimate
 print(c(PNeg2023Q1, PNeg2023Q2))
 
 # END
