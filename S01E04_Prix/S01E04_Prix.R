@@ -83,8 +83,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date("2010-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
+  scale_x_date(expand = c(0, 0), limits = c(date("2010-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
   scale_color_manual(
     breaks = c("IPC (officiel)", "PC (propre calcul)", "IPC (sans categories avec prix imputés en Avril 2020)"),
     values = c("#374e8e", "#006d64", "#ac004f")
@@ -117,8 +117,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date("2016-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
+  scale_x_date(expand = c(0, 0), limits = c(date("2016-12-01"), date("2020-12-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
   scale_color_manual(
     breaks = c("IPC", "Biens domestiques", "Biens importés"),
     values = c("#374e8e", "#006d64", "#ac004f")

@@ -96,8 +96,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1.5, 3.5), breaks = seq(-1.5, 3.5, 0.5)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1.5, 3.5), breaks = seq(-1.5, 3.5, 0.5)) +
   scale_color_manual(
     breaks = c("Confédération", "Entreprises (notation AA-AAA)", "Entreprises (notation BBB-AAA)"), 
     values = c("#374e8e", "#006d64", "#ac004f")
@@ -134,7 +134,7 @@ p <- ts_df(
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
   geom_vline(xintercept = myLines, colour = "blue", linewidth = 1, alpha = 0.5) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
   scale_color_manual(
     breaks = c("Notation AA-AAA", "Notation BBB-AAA"), 
     values = c("#006d64", "#ac004f")
@@ -182,8 +182,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 1.5), breaks = seq(-1, 1.5, 0.5)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 1.5), breaks = seq(-1, 1.5, 0.5)) +
   scale_color_manual(
     values = c("#374e8e", "#006d64"), 
     breaks = c("Prime de risque (notation BBB-AAA, en pp)", "Ouverture proc. de faillite (variation, en 1000 ouvertures par an)")

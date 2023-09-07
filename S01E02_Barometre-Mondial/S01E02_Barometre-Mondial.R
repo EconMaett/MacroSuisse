@@ -159,8 +159,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   scale_color_manual(
     breaks = c("Croissance du PIB Suisse (en %)", "Baromètre mondial (index avancé normalisé)"), 
     values = c("#374e8e", "#006d64")
@@ -196,8 +196,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   scale_color_manual(
     values = c("#374e8e", "#006d64", "#ac004f"), 
     breaks = c("Croissance du PIB (en %)", "Baromètre mondial (index av. norm.)", "Incertitude marchés financiers (norm.)")
@@ -246,7 +246,7 @@ p <- autoplot(Forecast, fan = TRUE) +
   geom_rect(data = chrecdp, aes(xmin = decimal_date(recession_start), xmax = decimal_date(recession_end), ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   
   scale_x_continuous(limits = c(2000, 2025)) +
-  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   labs(
     title = "Prévision croissance PIB Suisse (en %)",
     subtitle = "",

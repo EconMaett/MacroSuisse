@@ -139,8 +139,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), today()), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
   scale_color_manual(
     breaks = c("Taux directeur", "Swiss Average Rate Overnight (SARON)", "CHF Libor à trois mois"),
     values = c("#374e8e", "#006d64", "#ac004f")
@@ -174,8 +174,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date(start_date), date("2004-01-01")), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_x_date(expand = c(0, 0), limits = c(date(start_date), date("2004-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
   scale_color_manual(
     breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécairses", "Dépôt d'épargnes"), 
     values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
@@ -210,8 +210,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date("2006-01-01"), date("2010-01-01")), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_x_date(expand = c(0, 0), limits = c(date("2006-01-01"), date("2010-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
   scale_color_manual(
     breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
     values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
@@ -245,8 +245,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date("2013-01-01"), date("2017-01-01")), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_x_date(expand = c(0, 0), limits = c(date("2013-01-01"), date("2017-01-01")), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
   scale_color_manual(
     breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
     values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
@@ -281,8 +281,8 @@ p <- ts_df(
   geom_hline(yintercept = 0, color = "black", linetype = "solid", show.legend = FALSE) +
   geom_rect(data = chrecdp, aes(xmin = recession_start, xmax = recession_end, ymin = -Inf, ymax = +Inf), fill = "darkgrey", alpha = 0.3) +
   geom_line(mapping = aes(x = time, y = value, color = id), linewidth = 1) +
-  scale_x_date(limits = c(date("2016-01-01"), date(end_date)), date_breaks = "1 year", date_labels = "%Y") +
-  scale_y_continuous(limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
+  scale_x_date(expand = c(0, 0), limits = c(date("2016-01-01"), date(end_date)), date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(expand = c(0, 0), limits = c(-1, 5), breaks = seq(-1, 5, 1)) +
   scale_color_manual(
     breaks = c("Taux directeur", "Conféderation à 10 ans", "Entreprises à 8 ans", "Prêts hypothécaires", "Dépôts d'épargnes"), 
     values = c("#374e8e", "#006d64", "#ac004f", "#df7c18", "#a07bde")
