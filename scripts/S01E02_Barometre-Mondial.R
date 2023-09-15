@@ -12,22 +12,12 @@ library(xts)
 library(readxl)
 library(ggtext)
 
+source("R/getForecastVariance.R")
+
 chrecdp    <- read_csv(file = "Recession-Dates/Recession-Dates_CEPR_EA_Monthly_Midpoint.csv")
 start_date <- "1999-01-01"
 # Last date should be first date of last quarter
 end_date   <- round_date(x = today(), unit = "quarter") - months(3)
-
-# Ideally put the functions in a separate file and access them with the source() command
-getForecastVariance <- function(fcst) {
-  # Function to extract forecast error variance from a forecast object
-  # CI lower = y(t+h|t) - 1.96*sig(h)
-  # Therefore sig(h)^2 = [CI lower - y(t+h|t))/(-1.96)]^2
-  # Get exact percentile (1.96 yield basically the same)
-
-  z957 <- qnorm(0.975, 0, 1)
-  sigh2 <- ((fcst$lower[, "95%"] - fcst$mean) / (-z957))^2
-  return(sigh2)
-}
 
 
 # ************************************************************************
